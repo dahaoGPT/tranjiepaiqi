@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiepaiqi.alert.AlertMapper">
+    <insert id="insert" parameterType="com.jiepaiqi.alert.Alert">
+        INSERT INTO alerts (id, elder_id, device_id, type, status, reason, suggested_action,
+            occurred_at, acknowledged_at, resolved_at, created_at)
+        VALUES (#{id}, #{elderId}, #{deviceId}, #{type}, #{status}, #{reason}, #{suggestedAction},
+            #{occurredAt}, #{acknowledgedAt}, #{resolvedAt}, #{createdAt})
+    </insert>
+
+    <update id="update" parameterType="com.jiepaiqi.alert.Alert">
+        UPDATE alerts
+        SET type = #{type},
+            status = #{status},
+            reason = #{reason},
+            suggested_action = #{suggestedAction},
+            occurred_at = #{occurredAt},
+            acknowledged_at = #{acknowledgedAt},
+            resolved_at = #{resolvedAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

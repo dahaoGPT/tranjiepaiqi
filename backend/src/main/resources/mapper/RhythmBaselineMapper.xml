@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiepaiqi.rhythm.RhythmBaselineMapper">
+    <insert id="insert" parameterType="com.jiepaiqi.rhythm.RhythmBaseline">
+        INSERT INTO rhythm_baselines (id, elder_id, calculated_at, morning_window_start,
+            morning_window_end, average_daily_event_count, average_daily_duration_seconds)
+        VALUES (#{id}, #{elderId}, #{calculatedAt}, #{morningWindowStart},
+            #{morningWindowEnd}, #{averageDailyEventCount}, #{averageDailyDurationSeconds})
+    </insert>
+</mapper>

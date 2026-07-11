@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+.superpowers/
+backend/target/
+backend/storage/
+frontend/.next/
+frontend/node_modules/
+simulator/node_modules/
+*.log
+.env
+.env.local
+superpowers/

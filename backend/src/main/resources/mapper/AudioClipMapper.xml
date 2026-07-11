@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiepaiqi.audio.AudioClipMapper">
+    <insert id="insert" parameterType="com.jiepaiqi.audio.AudioClip">
+        INSERT INTO audio_clips (id, device_id, window_started_at, window_ended_at, 
+            storage_path, content_type, duration_seconds, size_bytes, created_at)
+        VALUES (#{id}, #{deviceId}, #{windowStartedAt}, #{windowEndedAt}, 
+            #{storagePath}, #{contentType}, #{durationSeconds}, #{sizeBytes}, #{createdAt})
+    </insert>
+
+    <delete id="delete" parameterType="java.util.UUID">
+        DELETE FROM audio_clips WHERE id = #{id}
+    </delete>
+</mapper>

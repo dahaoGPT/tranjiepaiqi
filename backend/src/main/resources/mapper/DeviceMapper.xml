@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiepaiqi.device.DeviceMapper">
+    <insert id="insert" parameterType="com.jiepaiqi.device.Device">
+        INSERT INTO devices (id, elder_id, serial_number, status, last_seen_at, created_at)
+        VALUES (#{id}, #{elderId}, #{serialNumber}, #{status}, #{lastSeenAt}, #{createdAt})
+    </insert>
+
+    <update id="update" parameterType="com.jiepaiqi.device.Device">
+        UPDATE devices
+        SET elder_id = #{elderId},
+            serial_number = #{serialNumber},
+            status = #{status},
+            last_seen_at = #{lastSeenAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

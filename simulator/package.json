@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "dev": "tsx src/index.ts normal",
+    "scenario:normal": "tsx src/index.ts normal",
+    "scenario:no-morning-water": "tsx src/index.ts no-morning-water",
+    "scenario:long-flow": "tsx src/index.ts long-flow",
+    "scenario:low-activity": "tsx src/index.ts low-activity"
+  },
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "tsx": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  }
+}

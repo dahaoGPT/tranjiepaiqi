@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiepaiqi.ingestion.AcousticFeatureMapper">
+    <insert id="insert" parameterType="com.jiepaiqi.ingestion.AcousticFeature">
+        INSERT INTO acoustic_features (id, device_id, audio_clip_id, window_started_at, window_ended_at,
+            average_decibels, peak_decibels, low_band_energy, mid_band_energy, high_band_energy,
+            flow_confidence, created_at)
+        VALUES (#{id}, #{deviceId}, #{audioClipId}, #{windowStartedAt}, #{windowEndedAt},
+            #{averageDecibels}, #{peakDecibels}, #{lowBandEnergy}, #{midBandEnergy}, #{highBandEnergy},
+            #{flowConfidence}, #{createdAt})
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO acoustic_features (id, device_id, audio_clip_id, window_started_at, window_ended_at,
+            average_decibels, peak_decibels, low_band_energy, mid_band_energy, high_band_energy,
+            flow_confidence, created_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.deviceId}, #{item.audioClipId}, #{item.windowStartedAt}, #{item.windowEndedAt},
+            #{item.averageDecibels}, #{item.peakDecibels}, #{item.lowBandEnergy}, #{item.midBandEnergy},
+            #{item.highBandEnergy}, #{item.flowConfidence}, #{item.createdAt})
+        </foreach>
+    </insert>
+</mapper>

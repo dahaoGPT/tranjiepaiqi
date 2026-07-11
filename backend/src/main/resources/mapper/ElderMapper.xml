@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiepaiqi.elder.ElderMapper">
+    <insert id="insert" parameterType="com.jiepaiqi.elder.Elder">
+        INSERT INTO elders (id, name, notes, created_at)
+        VALUES (#{id}, #{name}, #{notes}, #{createdAt})
+    </insert>
+
+    <update id="update" parameterType="com.jiepaiqi.elder.Elder">
+        UPDATE elders
+        SET name = #{name},
+            notes = #{notes}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.UUID">
+        DELETE FROM elders WHERE id = #{id}
+    </delete>
+</mapper>
