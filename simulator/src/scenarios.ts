@@ -192,15 +192,11 @@ export function getScenario(name: ScenarioName): Scenario {
 
     // 长时间流水场景（触发 LONG_CONTINUOUS_FLOW 异常）
     case "long-flow": {
-      // 晨间用水（7:30-7:45）
-      const morningFeatures = Array.from(
-        { length: 15 },
-        (_, i) => createWindow(scenarioDate, 7, 30, i * 10, 0.9)
-      );
-      // 长时间流水（8:00-11:00，180个窗口，共30分钟）
+      // 长时间流水（7:30-11:00，210个窗口，共35分钟）
+      // 注意：不再分开晨间用水和长时间流水，确保连续的高置信度窗口不被分段
       const longFlowFeatures = Array.from(
-        { length: 180 },
-        (_, i) => createWindow(scenarioDate, 8, 0, i * 10, 0.95)
+        { length: 210 },
+        (_, i) => createWindow(scenarioDate, 7, 30, i * 10, 0.95)
       );
       // 独立特征（11:00-11:10）
       const standaloneFeatures = Array.from(
@@ -211,7 +207,6 @@ export function getScenario(name: ScenarioName): Scenario {
       return {
         name,
         captures: [
-          createCapture("morning.wav", morningFeatures),
           createCapture("long-flow.wav", longFlowFeatures)
         ],
         standaloneFeatures

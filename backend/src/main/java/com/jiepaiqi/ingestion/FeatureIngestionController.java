@@ -134,7 +134,7 @@ public class FeatureIngestionController {
      * @param windows 新接收的特征窗口列表
      */
     private void processWaterEventsAndAlerts(Device device, List<AcousticFeatureWindow> windows) {
-        Instant todayStart = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant todayStart = LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant();
         List<AcousticFeature> todayFeatures = featureMapper.findByDeviceAndTimeRange(device.getId(), todayStart);
 
         List<AcousticFeatureWindow> allWindows = new ArrayList<>();
