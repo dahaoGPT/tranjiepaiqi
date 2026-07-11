@@ -1,6 +1,6 @@
 export type ScenarioName = "normal" | "no-morning-water" | "long-flow" | "low-activity";
 
-interface FeatureWindow {
+export interface FeatureWindow {
   windowStartedAt: string;
   windowEndedAt: string;
   averageDecibels: number;
@@ -11,17 +11,34 @@ interface FeatureWindow {
   flowConfidence: number;
 }
 
-export interface Scenario {
-  name: ScenarioName;
-  features: FeatureWindow[];
-  audioClips: Array<{ fileName: string; windowStartedAt: string; windowEndedAt: string }>;
+export interface AudioClipInput {
+  fileName: string;
+  windowStartedAt: string;
+  windowEndedAt: string;
 }
 
-function createWindow(hour: number, minute: number, seconds: number, confidence: number): FeatureWindow {
-  const start = new Date();
+export interface Capture {
+  audioClip: AudioClipInput;
+  features: FeatureWindow[];
+}
+
+export interface Scenario {
+  name: ScenarioName;
+  captures: Capture[];
+  standaloneFeatures?: FeatureWindow[];
+}
+
+function createWindow(
+  scenarioDate: Date,
+  hour: number,
+  minute: number,
+  seconds: number,
+  confidence: number
+): FeatureWindow {
+  const start = new Date(scenarioDate);
   start.setHours(hour, minute, seconds, 0);
   const end = new Date(start.getTime() + 10000);
-  
+
   return {
     windowStartedAt: start.toISOString(),
     windowEndedAt: end.toISOString(),
@@ -34,68 +51,117 @@ function createWindow(hour: number, minute: number, seconds: number, confidence:
   };
 }
 
+function createCapture(fileName: string, features: FeatureWindow[]): Capture {
+  if (features.length === 0) {
+    throw new Error(`Capture ${fileName} must contain at least one feature`);
+  }
+
+  return {
+    audioClip: {
+      fileName,
+      windowStartedAt: features[0].windowStartedAt,
+      windowEndedAt: features[features.length - 1].windowEndedAt
+    },
+    features
+  };
+}
+
 export function getScenario(name: ScenarioName): Scenario {
+  const scenarioDate = new Date();
+
   switch (name) {
-    case "normal":
-      return {
-        name: "normal",
-        features: [
-          ...Array.from({ length: 15 }, (_, i) => createWindow(7, 30, i * 10, 0.9)),
-          ...Array.from({ length: 10 }, (_, i) => createWindow(8, 0, i * 10, 0.85)),
-          ...Array.from({ length: 20 }, (_, i) => createWindow(12, 0, i * 10, 0.88)),
-          ...Array.from({ length: 15 }, (_, i) => createWindow(18, 0, i * 10, 0.92)),
-          ...Array.from({ length: 8 }, (_, i) => createWindow(20, 0, i * 10, 0.8)),
-          createWindow(20, 1, 0, 0.2),
-          createWindow(20, 1, 10, 0.15)
-        ],
-        audioClips: [
-          { fileName: "morning.wav", windowStartedAt: new Date(Date.now() - 8 * 3600000).toISOString(), windowEndedAt: new Date(Date.now() - 7 * 3600000).toISOString() },
-          { fileName: "lunch.wav", windowStartedAt: new Date(Date.now() - 4 * 3600000).toISOString(), windowEndedAt: new Date(Date.now() - 3 * 3600000).toISOString() },
-          { fileName: "dinner.wav", windowStartedAt: new Date(Date.now() - 1 * 3600000).toISOString(), windowEndedAt: new Date(Date.now()).toISOString() }
-        ]
-      };
+    case "normal": {
+      const morningFeatures = [
+        ...Array.from({ length: 15 }, (_, i) => createWindow(scenarioDate, 7, 30, i * 10, 0.9)),
+        ...Array.from({ length: 10 }, (_, i) => createWindow(scenarioDate, 8, 0, i * 10, 0.85))
+      ];
+      const lunchFeatures = Array.from(
+        { length: 20 },
+        (_, i) => createWindow(scenarioDate, 12, 0, i * 10, 0.88)
+      );
+      const dinnerFeatures = Array.from(
+        { length: 15 },
+        (_, i) => createWindow(scenarioDate, 18, 0, i * 10, 0.92)
+      );
+      const standaloneFeatures = [
+        ...Array.from({ length: 8 }, (_, i) => createWindow(scenarioDate, 20, 0, i * 10, 0.8)),
+        createWindow(scenarioDate, 20, 1, 0, 0.2),
+        createWindow(scenarioDate, 20, 1, 10, 0.15)
+      ];
 
-    case "no-morning-water":
       return {
-        name: "no-morning-water",
-        features: [
-          ...Array.from({ length: 5 }, (_, i) => createWindow(7, 0, i * 10, 0.1)),
-          ...Array.from({ length: 5 }, (_, i) => createWindow(7, 30, i * 10, 0.05)),
-          ...Array.from({ length: 5 }, (_, i) => createWindow(8, 0, i * 10, 0.08)),
-          ...Array.from({ length: 20 }, (_, i) => createWindow(12, 0, i * 10, 0.88)),
-          ...Array.from({ length: 15 }, (_, i) => createWindow(18, 0, i * 10, 0.92))
+        name,
+        captures: [
+          createCapture("morning.wav", morningFeatures),
+          createCapture("lunch.wav", lunchFeatures),
+          createCapture("dinner.wav", dinnerFeatures)
         ],
-        audioClips: [
-          { fileName: "lunch.wav", windowStartedAt: new Date(Date.now() - 4 * 3600000).toISOString(), windowEndedAt: new Date(Date.now() - 3 * 3600000).toISOString() }
-        ]
+        standaloneFeatures
       };
+    }
 
-    case "long-flow":
-      return {
-        name: "long-flow",
-        features: [
-          ...Array.from({ length: 15 }, (_, i) => createWindow(7, 30, i * 10, 0.9)),
-          ...Array.from({ length: 180 }, (_, i) => createWindow(8, 0, i * 10, 0.95)),
-          ...Array.from({ length: 10 }, (_, i) => createWindow(11, 0, i * 10, 0.85))
-        ],
-        audioClips: [
-          { fileName: "morning.wav", windowStartedAt: new Date(Date.now() - 8 * 3600000).toISOString(), windowEndedAt: new Date(Date.now() - 7 * 3600000).toISOString() },
-          { fileName: "long-flow.wav", windowStartedAt: new Date(Date.now() - 5 * 3600000).toISOString(), windowEndedAt: new Date(Date.now() - 2 * 3600000).toISOString() }
-        ]
-      };
+    case "no-morning-water": {
+      const morningFeatures = [
+        ...Array.from({ length: 5 }, (_, i) => createWindow(scenarioDate, 7, 0, i * 10, 0.1)),
+        ...Array.from({ length: 5 }, (_, i) => createWindow(scenarioDate, 7, 30, i * 10, 0.05)),
+        ...Array.from({ length: 5 }, (_, i) => createWindow(scenarioDate, 8, 0, i * 10, 0.08))
+      ];
+      const lunchFeatures = Array.from(
+        { length: 20 },
+        (_, i) => createWindow(scenarioDate, 12, 0, i * 10, 0.88)
+      );
+      const eveningFeatures = Array.from(
+        { length: 15 },
+        (_, i) => createWindow(scenarioDate, 18, 0, i * 10, 0.92)
+      );
 
-    case "low-activity":
       return {
-        name: "low-activity",
-        features: [
-          ...Array.from({ length: 5 }, (_, i) => createWindow(8, 0, i * 10, 0.85)),
-          createWindow(12, 0, 0, 0.7),
-          createWindow(12, 0, 10, 0.65)
-        ],
-        audioClips: [
-          { fileName: "minimal.wav", windowStartedAt: new Date(Date.now() - 6 * 3600000).toISOString(), windowEndedAt: new Date(Date.now() - 5 * 3600000).toISOString() }
-        ]
+        name,
+        captures: [createCapture("lunch.wav", lunchFeatures)],
+        standaloneFeatures: [...morningFeatures, ...eveningFeatures]
       };
+    }
+
+    case "long-flow": {
+      const morningFeatures = Array.from(
+        { length: 15 },
+        (_, i) => createWindow(scenarioDate, 7, 30, i * 10, 0.9)
+      );
+      const longFlowFeatures = Array.from(
+        { length: 180 },
+        (_, i) => createWindow(scenarioDate, 8, 0, i * 10, 0.95)
+      );
+      const standaloneFeatures = Array.from(
+        { length: 10 },
+        (_, i) => createWindow(scenarioDate, 11, 0, i * 10, 0.85)
+      );
+
+      return {
+        name,
+        captures: [
+          createCapture("morning.wav", morningFeatures),
+          createCapture("long-flow.wav", longFlowFeatures)
+        ],
+        standaloneFeatures
+      };
+    }
+
+    case "low-activity": {
+      const morningFeatures = Array.from(
+        { length: 5 },
+        (_, i) => createWindow(scenarioDate, 8, 0, i * 10, 0.85)
+      );
+      const standaloneFeatures = [
+        createWindow(scenarioDate, 12, 0, 0, 0.7),
+        createWindow(scenarioDate, 12, 0, 10, 0.65)
+      ];
+
+      return {
+        name,
+        captures: [createCapture("minimal.wav", morningFeatures)],
+        standaloneFeatures
+      };
+    }
 
     default:
       throw new Error(`Unknown scenario: ${name}`);

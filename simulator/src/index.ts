@@ -1,6 +1,6 @@
-import { getScenario, ScenarioName } from "./scenarios";
+import { AudioClipInput, FeatureWindow, getScenario, ScenarioName } from "./scenarios";
+import { executeScenario } from "./scenario-runner";
 import * as http from "http";
-import * as fs from "fs";
 
 const BASE_URL = "http://localhost:8080";
 const DEVICE_ID = "sim-device-001";
@@ -56,7 +56,7 @@ async function uploadAudioClip(fileName: string, windowStartedAt: string, window
         res.on("end", () => {
           if (res.statusCode === 200) {
             try {
-              // 解析响应，提取 audioClipId的类型
+              // 解析响应，提取 audioClipId
               const json = JSON.parse(data);
               console.log(`音频上传成功: ${json.audioClipId}`);
               resolve(json.audioClipId);
@@ -82,7 +82,7 @@ async function uploadAudioClip(fileName: string, windowStartedAt: string, window
   });
 }
 
-async function uploadFeatures(features: any[], audioClipId?: string) {
+async function uploadFeatures(features: FeatureWindow[], audioClipId?: string) {
   const payload = {
     features: features.map(f => ({
       ...f,
@@ -105,18 +105,15 @@ async function runScenario(scenarioName: ScenarioName) {
   console.log(`\n=== 运行场景: ${scenarioName} ===`);
   
   const scenario = getScenario(scenarioName);
-  
-  for (const audioClip of scenario.audioClips) {
-    const clipId = await uploadAudioClip(audioClip.fileName, audioClip.windowStartedAt, audioClip.windowEndedAt);
-    if (clipId) {
-      const batchSize = 50;
-      for (let i = 0; i < scenario.features.length; i += batchSize) {
-        const batch = scenario.features.slice(i, i + batchSize);
-        await uploadFeatures(batch, clipId);
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    }
-  }
+
+  await executeScenario(scenario, {
+    uploadAudioClip: (audioClip: AudioClipInput) => uploadAudioClip(
+      audioClip.fileName,
+      audioClip.windowStartedAt,
+      audioClip.windowEndedAt
+    ),
+    uploadFeatures
+  });
   
   console.log(`\n=== 场景 ${scenarioName} 完成 ===`);
 }

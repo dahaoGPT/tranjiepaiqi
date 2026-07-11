@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "test": "tsx --test src/*.test.ts",
     "dev": "tsx src/index.ts normal",
     "scenario:normal": "tsx src/index.ts normal",
     "scenario:no-morning-water": "tsx src/index.ts no-morning-water",

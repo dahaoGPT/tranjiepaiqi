@@ -10,3 +10,4 @@ simulator/node_modules/
 .env
 .env.local
 superpowers/
+backend/backend/storage/audio/
