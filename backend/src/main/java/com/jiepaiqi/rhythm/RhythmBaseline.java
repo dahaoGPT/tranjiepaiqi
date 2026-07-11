@@ -20,8 +20,17 @@ public class RhythmBaseline {
     private Double averageDailyEventCount;
     private Double averageDailyDurationSeconds;
 
-    public static RhythmBaseline of(LocalTime morningWindowStart, LocalTime morningWindowEnd, 
-                                    double averageDailyEventCount, double averageDailyDurationSeconds) {
+    /**
+     * 创建节律基线对象。
+     * 
+     * @param morningWindowStart          晨间用水窗口开始时间
+     * @param morningWindowEnd            晨间用水窗口结束时间
+     * @param averageDailyEventCount      日均用水次数
+     * @param averageDailyDurationSeconds 日均用水总时长（秒）
+     * @return 创建的节律基线对象
+     */
+    public static RhythmBaseline of(LocalTime morningWindowStart, LocalTime morningWindowEnd,
+            double averageDailyEventCount, double averageDailyDurationSeconds) {
         RhythmBaseline baseline = new RhythmBaseline();
         baseline.setMorningWindowStart(morningWindowStart);
         baseline.setMorningWindowEnd(morningWindowEnd);

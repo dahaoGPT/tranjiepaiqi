@@ -39,6 +39,16 @@ public class FeatureIngestionController {
     private final WaterEventAggregator aggregator;
     private final AlertRuleEngine alertRuleEngine;
 
+    /**
+     * 构造函数。
+     * 注入所需的Mapper依赖，并初始化用水事件聚合器和异常规则引擎。
+     * 
+     * @param featureMapper    声学特征数据访问接口
+     * @param deviceMapper     设备数据访问接口
+     * @param waterEventMapper 用水事件数据访问接口
+     * @param alertMapper      异常提醒数据访问接口
+     * @param baselineMapper   节律基线数据访问接口
+     */
     public FeatureIngestionController(AcousticFeatureMapper featureMapper, DeviceMapper deviceMapper,
             WaterEventMapper waterEventMapper, AlertMapper alertMapper,
             RhythmBaselineMapper baselineMapper) {
@@ -51,6 +61,14 @@ public class FeatureIngestionController {
         this.alertRuleEngine = new AlertRuleEngine();
     }
 
+    /**
+     * 接收声学特征数据。
+     * 验证设备和特征数据，存储有效特征，并触发用水事件聚合和异常规则检查。
+     * 
+     * @param deviceId 设备序列号
+     * @param request  特征接收请求，包含多个特征数据
+     * @return 接收响应，包含接受和拒绝的特征数量
+     */
     @PostMapping
     public FeatureIngestionResponse ingestFeatures(@PathVariable String deviceId,
             @RequestBody FeatureIngestionRequest request) {
@@ -108,10 +126,17 @@ public class FeatureIngestionController {
                 .build();
     }
 
+    /**
+     * 处理用水事件和异常检测。
+     * 从今日所有声学特征聚合用水事件，并检查异常规则。
+     * 
+     * @param device  设备对象
+     * @param windows 新接收的特征窗口列表
+     */
     private void processWaterEventsAndAlerts(Device device, List<AcousticFeatureWindow> windows) {
         Instant todayStart = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC);
         List<AcousticFeature> todayFeatures = featureMapper.findByDeviceAndTimeRange(device.getId(), todayStart);
-        
+
         List<AcousticFeatureWindow> allWindows = new ArrayList<>();
         for (AcousticFeature feature : todayFeatures) {
             AcousticFeatureWindow window = new AcousticFeatureWindow();
@@ -150,6 +175,14 @@ public class FeatureIngestionController {
         saveAlerts(device.getElderId(), device.getId(), lowActivityAlerts);
     }
 
+    /**
+     * 保存异常提醒。
+     * 检查是否存在重复的同类型OPEN状态异常，避免重复告警。
+     * 
+     * @param elderId    老人ID
+     * @param deviceId   设备ID
+     * @param candidates 异常候选列表
+     */
     private void saveAlerts(UUID elderId, UUID deviceId, List<AlertCandidate> candidates) {
         for (AlertCandidate candidate : candidates) {
             if (!hasDuplicateAlert(elderId, candidate.getType())) {
@@ -168,12 +201,26 @@ public class FeatureIngestionController {
         }
     }
 
+    /**
+     * 检查是否存在重复的异常提醒。
+     * 
+     * @param elderId 老人ID
+     * @param type    异常类型
+     * @return true表示存在重复，false表示不存在
+     */
     private boolean hasDuplicateAlert(UUID elderId, AlertType type) {
         List<Alert> existingAlerts = alertMapper.findByElderAndStatus(elderId, "OPEN");
         return existingAlerts.stream()
                 .anyMatch(a -> a.getType().equals(type.name()));
     }
 
+    /**
+     * 创建默认节律基线。
+     * 当老人没有基线时使用默认值创建，晨间窗口为6:30-9:00，日均5次，时长900秒。
+     * 
+     * @param elderId 老人ID
+     * @return 创建的节律基线对象
+     */
     private RhythmBaseline createDefaultBaseline(UUID elderId) {
         RhythmBaseline baseline = new RhythmBaseline();
         baseline.setId(UUID.randomUUID());
@@ -187,6 +234,13 @@ public class FeatureIngestionController {
         return baseline;
     }
 
+    /**
+     * 验证特征数据有效性。
+     * 检查时间窗口和置信度是否有效。
+     * 
+     * @param dto 特征数据传输对象
+     * @return true表示有效，false表示无效
+     */
     private boolean isValidFeature(FeatureIngestionRequest.FeatureDto dto) {
         if (dto.getWindowStartedAt() == null || dto.getWindowEndedAt() == null) {
             return false;

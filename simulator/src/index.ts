@@ -2,17 +2,28 @@ import { AudioClipInput, FeatureWindow, getScenario, ScenarioName } from "./scen
 import { executeScenario } from "./scenario-runner";
 import * as http from "http";
 
+/** 后端服务基础地址 */
 const BASE_URL = "http://localhost:8080";
+/** 模拟设备ID */
 const DEVICE_ID = "sim-device-001";
 
+/**
+ * 上传模拟音频片段到后端。
+ * @param fileName 文件名
+ * @param windowStartedAt 窗口开始时间
+ * @param windowEndedAt 窗口结束时间
+ * @returns 音频片段ID
+ */
 async function uploadAudioClip(fileName: string, windowStartedAt: string, windowEndedAt: string): Promise<string> {
-  const syntheticAudio = Buffer.alloc(1024, 0x80);// 生成1KB的模拟音频数据
-  // ... 添加 file、windowStartedAt、windowEndedAt 字段
+  // 生成1KB的模拟音频数据（静音波形）
+  const syntheticAudio = Buffer.alloc(1024, 0x80);
+  // 构建 multipart/form-data 请求体
   const boundary = "----WebKitFormBoundary" + Math.random().toString(36).substr(2);
   const crlf = "\r\n";
   
   const parts: Buffer[] = [];
   
+  // 添加文件字段
   parts.push(Buffer.from(`--${boundary}${crlf}`));
   parts.push(Buffer.from(`Content-Disposition: form-data; name="file"; filename="${fileName}"${crlf}`));
   parts.push(Buffer.from(`Content-Type: audio/wav${crlf}`));
@@ -20,18 +31,21 @@ async function uploadAudioClip(fileName: string, windowStartedAt: string, window
   parts.push(syntheticAudio);
   parts.push(Buffer.from(crlf));
   
+  // 添加窗口开始时间字段
   parts.push(Buffer.from(`--${boundary}${crlf}`));
   parts.push(Buffer.from(`Content-Disposition: form-data; name="windowStartedAt"${crlf}`));
   parts.push(Buffer.from(crlf));
   parts.push(Buffer.from(windowStartedAt));
   parts.push(Buffer.from(crlf));
   
+  // 添加窗口结束时间字段
   parts.push(Buffer.from(`--${boundary}${crlf}`));
   parts.push(Buffer.from(`Content-Disposition: form-data; name="windowEndedAt"${crlf}`));
   parts.push(Buffer.from(crlf));
   parts.push(Buffer.from(windowEndedAt));
   parts.push(Buffer.from(crlf));
   
+  // 添加结束边界
   parts.push(Buffer.from(`--${boundary}--${crlf}`));
   
   const body = Buffer.concat(parts);
@@ -82,6 +96,12 @@ async function uploadAudioClip(fileName: string, windowStartedAt: string, window
   });
 }
 
+/**
+ * 上传声学特征数据到后端。
+ * @param features 特征窗口列表
+ * @param audioClipId 关联的音频片段ID（可选）
+ * @returns 上传结果
+ */
 async function uploadFeatures(features: FeatureWindow[], audioClipId?: string) {
   const payload = {
     features: features.map(f => ({
@@ -101,11 +121,17 @@ async function uploadFeatures(features: FeatureWindow[], audioClipId?: string) {
   return data;
 }
 
+/**
+ * 运行指定的模拟场景。
+ * @param scenarioName 场景名称
+ */
 async function runScenario(scenarioName: ScenarioName) {
   console.log(`\n=== 运行场景: ${scenarioName} ===`);
   
+  // 获取场景配置
   const scenario = getScenario(scenarioName);
 
+  // 执行场景
   await executeScenario(scenario, {
     uploadAudioClip: (audioClip: AudioClipInput) => uploadAudioClip(
       audioClip.fileName,
@@ -118,6 +144,10 @@ async function runScenario(scenarioName: ScenarioName) {
   console.log(`\n=== 场景 ${scenarioName} 完成 ===`);
 }
 
+/**
+ * 模拟器主入口函数。
+ * 从命令行参数获取场景名称，默认运行 normal 场景。
+ */
 async function main() {
   const scenarioName = process.argv[2] as ScenarioName || "normal";
   
@@ -133,4 +163,5 @@ async function main() {
   }
 }
 
+// 启动模拟器
 main();

@@ -20,6 +20,15 @@ public class WaterEvent {
     private Double averageConfidence;
     private Instant createdAt;
 
+    /**
+     * 创建用水事件对象。
+     * 自动计算持续时长（秒）。
+     * 
+     * @param startedAt  事件开始时间
+     * @param endedAt    事件结束时间
+     * @param confidence 平均水流置信度（0-1）
+     * @return 创建的用水事件对象
+     */
     public static WaterEvent of(Instant startedAt, Instant endedAt, double confidence) {
         WaterEvent event = new WaterEvent();
         event.setStartedAt(startedAt);

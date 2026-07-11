@@ -14,6 +14,14 @@ public class AcousticFeatureWindow {
     private Instant windowEndedAt;
     private double flowConfidence;
 
+    /**
+     * 创建示例声学特征窗口。
+     * 窗口持续时间固定为10秒。
+     * 
+     * @param startedAt  窗口开始时间
+     * @param confidence 水流置信度（0-1）
+     * @return 创建的示例窗口
+     */
     public static AcousticFeatureWindow sample(Instant startedAt, double confidence) {
         AcousticFeatureWindow window = new AcousticFeatureWindow();
         window.setWindowStartedAt(startedAt);

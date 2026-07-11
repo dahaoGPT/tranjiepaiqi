@@ -3,11 +3,16 @@ import assert from "node:assert/strict";
 import { executeScenario, ScenarioUploadGateway } from "./scenario-runner";
 import { FeatureWindow, Scenario } from "./scenarios";
 
+/**
+ * 创建特征窗口辅助函数。
+ * @param second 秒数（相对于 2026-07-11 08:00:00 UTC）
+ * @returns 特征窗口对象
+ */
 function feature(second: number): FeatureWindow {
   const start = new Date(Date.UTC(2026, 6, 11, 8, 0, second));
   return {
     windowStartedAt: start.toISOString(),
-    windowEndedAt: new Date(start.getTime() + 10000).toISOString(),
+    windowEndedAt: new Date(start.getTime() + 10000).toISOString(), // 窗口持续10秒
     averageDecibels: 50,
     peakDecibels: 60,
     lowBandEnergy: 0.2,
@@ -17,6 +22,11 @@ function feature(second: number): FeatureWindow {
   };
 }
 
+/**
+ * 创建测试场景辅助函数。
+ * 包含两个采集，共3个特征窗口。
+ * @returns 场景对象
+ */
 function scenario(): Scenario {
   const first = [feature(0), feature(10)];
   const second = [feature(20)];
@@ -43,7 +53,10 @@ function scenario(): Scenario {
   };
 }
 
-test("uploads each capture's features once with its own clip ID", async () => {
+/**
+ * 测试：每个采集的特征使用其自己的音频片段ID上传。
+ */
+test("每个采集的特征使用其自己的音频片段ID上传", async () => {
   const uploaded: Array<{ seconds: number[]; clipId?: string }> = [];
   const gateway: ScenarioUploadGateway = {
     uploadAudioClip: async clip => `id-${clip.fileName}`,
@@ -63,7 +76,10 @@ test("uploads each capture's features once with its own clip ID", async () => {
   ]);
 });
 
-test("uploads standalone features without a clip ID", async () => {
+/**
+ * 测试：独立特征不关联音频片段ID上传。
+ */
+test("独立特征不关联音频片段ID上传", async () => {
   const input = scenario();
   input.standaloneFeatures = [feature(30)];
   const clipIds: Array<string | undefined> = [];
@@ -79,10 +95,13 @@ test("uploads standalone features without a clip ID", async () => {
   assert.deepEqual(clipIds, ["id-first.wav", "id-second.wav", undefined]);
 });
 
-test("stops before uploading capture features when its audio upload fails", async () => {
+/**
+ * 测试：当音频上传失败时，停止上传该采集的特征。
+ */
+test("音频上传失败时停止上传该采集的特征", async () => {
   let featureUploadCount = 0;
   const gateway: ScenarioUploadGateway = {
-    uploadAudioClip: async () => "",
+    uploadAudioClip: async () => "", // 返回空字符串表示上传失败
     uploadFeatures: async () => {
       featureUploadCount++;
     }
@@ -95,8 +114,12 @@ test("stops before uploading capture features when its audio upload fails", asyn
   assert.equal(featureUploadCount, 0);
 });
 
-test("splits feature uploads into batches of at most 50", async () => {
+/**
+ * 测试：特征上传按批次拆分，每批最多50个。
+ */
+test("特征上传按批次拆分，每批最多50个", async () => {
   const input = scenario();
+  // 创建101个特征窗口，验证分批上传
   const features = Array.from({ length: 101 }, (_, i) => feature(i * 10));
   input.captures = [{
     audioClip: {
@@ -119,7 +142,10 @@ test("splits feature uploads into batches of at most 50", async () => {
   assert.deepEqual(batchSizes, [50, 50, 1]);
 });
 
-test("rejects a configured batch size greater than 50", async () => {
+/**
+ * 测试：拒绝配置的批次大小超过50。
+ */
+test("拒绝配置的批次大小超过50", async () => {
   const gateway: ScenarioUploadGateway = {
     uploadAudioClip: async () => "clip-id",
     uploadFeatures: async () => undefined

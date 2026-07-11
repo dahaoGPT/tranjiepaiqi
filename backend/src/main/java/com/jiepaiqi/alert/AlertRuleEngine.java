@@ -14,6 +14,14 @@ import java.util.List;
  * 根据固定规则和个人基线判断异常。
  */
 public class AlertRuleEngine {
+    /**
+     * 评估晨间用水异常。
+     * 判断当前时间是否已过晨间用水窗口结束时间，且今日尚未发生晨间用水事件。
+     * @param now 当前时间
+     * @param baseline 个人用水节律基线
+     * @param todayEvents 今日所有用水事件列表
+     * @return 异常候选列表，无异常时返回空列表
+     */
     public List<AlertCandidate> evaluateMorning(Instant now, RhythmBaseline baseline, List<WaterEvent> todayEvents) {
         List<AlertCandidate> candidates = new ArrayList<>();
 
@@ -42,6 +50,13 @@ public class AlertRuleEngine {
         return candidates;
     }
 
+    /**
+     * 评估长流水异常。
+     * 检查每个用水事件的持续时长是否超过阈值，可能表示水龙头忘记关闭。
+     * @param events 用水事件列表
+     * @param maxDurationSeconds 最大允许持续时长（秒）
+     * @return 异常候选列表，无异常时返回空列表
+     */
     public List<AlertCandidate> evaluateLongFlow(List<WaterEvent> events, int maxDurationSeconds) {
         List<AlertCandidate> candidates = new ArrayList<>();
 
@@ -60,6 +75,13 @@ public class AlertRuleEngine {
         return candidates;
     }
 
+    /**
+     * 评估每日活动量低异常。
+     * 比较今日用水次数和总时长与个人基线的30%阈值，显著偏低时触发异常。
+     * @param todayEvents 今日所有用水事件列表
+     * @param baseline 个人用水节律基线
+     * @return 异常候选列表，无异常时返回空列表
+     */
     public List<AlertCandidate> evaluateLowDailyActivity(List<WaterEvent> todayEvents, RhythmBaseline baseline) {
         List<AlertCandidate> candidates = new ArrayList<>();
 
@@ -84,6 +106,12 @@ public class AlertRuleEngine {
         return candidates;
     }
 
+    /**
+     * 判断异常类型是否为生活节律类异常。
+     * 设备离线类异常不属于生活节律异常。
+     * @param type 异常类型
+     * @return true表示是生活节律异常，false表示是设备异常
+     */
     public boolean isLifeRhythmAlert(AlertType type) {
         return type != AlertType.DEVICE_OFFLINE;
     }

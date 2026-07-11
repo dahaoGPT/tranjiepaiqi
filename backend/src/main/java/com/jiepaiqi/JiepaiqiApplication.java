@@ -9,6 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class JiepaiqiApplication {
+    /**
+     * 应用主入口方法。
+     * 启动 Spring Boot 应用。
+     * 
+     * @param args 命令行参数
+     */
     public static void main(String[] args) {
         SpringApplication.run(JiepaiqiApplication.class, args);
     }

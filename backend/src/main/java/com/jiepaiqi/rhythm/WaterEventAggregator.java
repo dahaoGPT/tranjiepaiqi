@@ -15,11 +15,22 @@ public class WaterEventAggregator {
     private final double confidenceThreshold;
     private final int maxGapSeconds;
 
+    /**
+     * 构造函数。
+     * @param confidenceThreshold 置信度阈值，低于此值的窗口将被过滤
+     * @param maxGapSeconds 窗口间最大间隔秒数，超过此间隔则分割为不同事件
+     */
     public WaterEventAggregator(double confidenceThreshold, int maxGapSeconds) {
         this.confidenceThreshold = confidenceThreshold;
         this.maxGapSeconds = maxGapSeconds;
     }
 
+    /**
+     * 聚合声学特征窗口为用水事件。
+     * 按置信度过滤窗口，按时间排序后，将间隔小于阈值的连续窗口聚合成单个用水事件。
+     * @param windows 声学特征窗口列表
+     * @return 聚合后的用水事件列表
+     */
     public List<WaterEvent> aggregate(List<AcousticFeatureWindow> windows) {
         List<WaterEvent> events = new ArrayList<>();
         if (windows == null || windows.isEmpty()) {
@@ -59,6 +70,12 @@ public class WaterEventAggregator {
         return events;
     }
 
+    /**
+     * 从窗口组创建用水事件。
+     * 使用第一个窗口的开始时间和最后一个窗口的结束时间作为事件的时间范围。
+     * @param windows 连续的声学特征窗口组
+     * @return 创建的用水事件
+     */
     private WaterEvent createEvent(List<AcousticFeatureWindow> windows) {
         Instant startedAt = windows.get(0).getWindowStartedAt();
         Instant endedAt = windows.get(windows.size() - 1).getWindowEndedAt();
