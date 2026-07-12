@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:14
+    image: postgres:15
     container_name: jiepaiqi-postgres
     environment:
       POSTGRES_DB: jiepaiqi
