@@ -44,4 +44,12 @@ public interface AcousticFeatureMapper {
      * @param features 声学特征列表
      */
     void batchInsert(List<AcousticFeature> features);
+
+    /**
+     * 删除指定时间范围内的声学特征（用于重新测试）。
+     * 
+     * @param deviceId  设备ID
+     * @param startTime 开始时间
+     */
+    void deleteByDeviceAndTimeRange(UUID deviceId, Instant startTime);
 }

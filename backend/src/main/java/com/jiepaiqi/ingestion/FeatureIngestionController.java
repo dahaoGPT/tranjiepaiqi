@@ -253,4 +253,24 @@ public class FeatureIngestionController {
         }
         return dto.getAverageDecibels() != null && dto.getPeakDecibels() != null;
     }
+
+    /**
+     * 清除指定设备的今日测试数据（仅用于测试）。
+     * 
+     * @param deviceId 设备序列号
+     * @return 清除结果
+     */
+    @DeleteMapping("/reset")
+    public String resetTestData(@PathVariable String deviceId) {
+        Device device = deviceMapper.findBySerialNumber(deviceId);
+        if (device == null) {
+            return "设备不存在";
+        }
+
+        Instant todayStart = LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant();
+        featureMapper.deleteByDeviceAndTimeRange(device.getId(), todayStart);
+        waterEventMapper.deleteByElderAndTimeRange(device.getElderId(), todayStart);
+
+        return "已清除今日数据";
+    }
 }

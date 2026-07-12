@@ -21,4 +21,8 @@
             #{item.highBandEnergy}, #{item.flowConfidence}, #{item.createdAt})
         </foreach>
     </insert>
+
+    <delete id="deleteByDeviceAndTimeRange">
+        DELETE FROM acoustic_features WHERE device_id = #{deviceId} AND window_started_at >= #{startTime}
+    </delete>
 </mapper>

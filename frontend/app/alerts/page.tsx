@@ -17,19 +17,25 @@ export default function AlertsPage() {
   /**
    * 获取异常列表数据。
    */
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // 固定老人ID，实际应用中应从用户绑定关系获取
-        const data = await getAlerts('550e8400-e29b-41d4-a716-446655440001');
-        setAlerts(data);
-      } catch (error) {
-        console.error('获取异常列表失败:', error);
-      } finally {
-        setLoading(false);
-      }
+  const fetchData = async () => {
+    try {
+      // 固定老人ID，实际应用中应从用户绑定关系获取
+      const data = await getAlerts('550e8400-e29b-41d4-a716-446655440001');
+      setAlerts(data);
+    } catch (error) {
+      console.error('获取异常列表失败:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  /**
+   * 组件挂载时获取数据，并设置定时刷新（30秒间隔）。
+   */
+  useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   // 加载中状态
@@ -40,7 +46,16 @@ export default function AlertsPage() {
   // 正常渲染
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">异常提醒列表</h2>
+      {/* 页面标题和刷新按钮 */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">异常提醒列表</h2>
+        <button 
+          onClick={() => { setLoading(true); fetchData(); }}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          刷新
+        </button>
+      </div>
       {alerts.length > 0 ? (
         <div className="space-y-4">
           {alerts.map((alert) => (
