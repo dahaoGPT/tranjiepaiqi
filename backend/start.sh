@@ -29,7 +29,21 @@ check_java() {
     info "Java 版本: $java_version"
 }
 
+ensure_mvnw_executable() {
+    if [ ! -x "$MVNW" ]; then
+        info "Maven Wrapper 缺少执行权限，正在设置..."
+        chmod +x "$MVNW"
+        if [ $? -eq 0 ]; then
+            success "Maven Wrapper 执行权限已设置"
+        else
+            error "设置 Maven Wrapper 执行权限失败，请手动执行: chmod +x $MVNW"
+            exit 1
+        fi
+    fi
+}
+
 build_project() {
+    ensure_mvnw_executable
     info "开始编译项目..."
     cd "$PROJECT_DIR"
     "$MVNW" clean package -DskipTests
@@ -42,6 +56,7 @@ build_project() {
 }
 
 run_dev() {
+    ensure_mvnw_executable
     info "启动开发模式..."
     cd "$PROJECT_DIR"
     "$MVNW" spring-boot:run
