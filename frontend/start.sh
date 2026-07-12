@@ -3,10 +3,8 @@
 set -e
 
 PROJECT_DIR=$(cd "$(dirname "$0")" && pwd)
-APP_NAME="jiepaiqi-backend"
-APP_VERSION="0.1.0-SNAPSHOT"
-JAR_FILE="${PROJECT_DIR}/target/${APP_NAME}-${APP_VERSION}.jar"
-MVNW="${PROJECT_DIR}/.mvn/wrapper/mvnw"
+PID_FILE="${PROJECT_DIR}/frontend.pid"
+LOG_FILE="${PROJECT_DIR}/frontend.log"
 
 info() {
     echo -e "\033[1;34m[INFO]\033[0m $1"
@@ -20,71 +18,64 @@ error() {
     echo -e "\033[1;31m[ERROR]\033[0m $1"
 }
 
-check_java() {
-    if ! command -v java &> /dev/null; then
-        error "Java 未安装，请先安装 JDK 8+"
+check_node() {
+    if ! command -v node &> /dev/null; then
+        error "Node.js 未安装，请先安装 Node.js"
         exit 1
     fi
-    java_version=$(java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}')
-    info "Java 版本: $java_version"
+    node_version=$(node --version)
+    info "Node.js 版本: $node_version"
 }
 
-ensure_mvnw_executable() {
-    if [ ! -x "$MVNW" ]; then
-        info "Maven Wrapper 缺少执行权限，正在设置..."
-        chmod +x "$MVNW"
+install_deps() {
+    if [ ! -d "${PROJECT_DIR}/node_modules" ]; then
+        info "安装依赖..."
+        cd "$PROJECT_DIR"
+        npm install
         if [ $? -eq 0 ]; then
-            success "Maven Wrapper 执行权限已设置"
+            success "依赖安装成功"
         else
-            error "设置 Maven Wrapper 执行权限失败，请手动执行: chmod +x $MVNW"
+            error "依赖安装失败"
             exit 1
         fi
-    fi
-}
-
-build_project() {
-    ensure_mvnw_executable
-    info "开始编译项目..."
-    cd "$PROJECT_DIR"
-    "$MVNW" clean package -DskipTests
-    if [ $? -eq 0 ]; then
-        success "项目编译成功"
     else
-        error "项目编译失败"
-        exit 1
+        info "依赖已存在，跳过安装"
     fi
 }
 
 run_dev() {
-    ensure_mvnw_executable
+    install_deps
     info "启动开发模式..."
     cd "$PROJECT_DIR"
-    "$MVNW" spring-boot:run
+    npm run dev
 }
 
 run_prod() {
-    if [ ! -f "$JAR_FILE" ]; then
-        info "JAR 文件不存在，先编译项目..."
-        build_project
+    install_deps
+    info "构建生产版本..."
+    cd "$PROJECT_DIR"
+    npm run build
+    if [ $? -ne 0 ]; then
+        error "构建失败"
+        exit 1
     fi
+    success "构建成功"
     info "启动生产模式..."
-    nohup java -jar "$JAR_FILE" > /dev/null 2>&1 &
-    echo $! > "${PROJECT_DIR}/backend.pid"
-    success "服务已启动，PID 已保存到 backend.pid"
+    nohup npx next start > "$LOG_FILE" 2>&1 &
+    echo $! > "$PID_FILE"
+    success "服务已启动，PID 已保存到 frontend.pid"
 }
 
 run_foreground() {
-    if [ ! -f "$JAR_FILE" ]; then
-        info "JAR 文件不存在，先编译项目..."
-        build_project
-    fi
+    install_deps
     info "启动服务（前台模式）..."
-    java -jar "$JAR_FILE"
+    cd "$PROJECT_DIR"
+    npm run dev
 }
 
 stop_service() {
-    if [ -f "${PROJECT_DIR}/backend.pid" ]; then
-        pid=$(cat "${PROJECT_DIR}/backend.pid")
+    if [ -f "$PID_FILE" ]; then
+        pid=$(cat "$PID_FILE")
         info "停止服务 (PID: $pid)..."
         if kill -0 "$pid" 2>/dev/null; then
             kill "$pid"
@@ -96,19 +87,19 @@ stop_service() {
         else
             info "进程 $pid 不存在"
         fi
-        rm -f "${PROJECT_DIR}/backend.pid"
+        rm -f "$PID_FILE"
     else
-        info "未找到 backend.pid 文件"
+        info "未找到 frontend.pid 文件"
     fi
 }
 
 show_status() {
-    if [ -f "${PROJECT_DIR}/backend.pid" ]; then
-        pid=$(cat "${PROJECT_DIR}/backend.pid")
+    if [ -f "$PID_FILE" ]; then
+        pid=$(cat "$PID_FILE")
         if kill -0 "$pid" 2>/dev/null; then
             success "服务运行中 (PID: $pid)"
         else
-            info "backend.pid 存在但进程已停止"
+            info "frontend.pid 存在但进程已停止"
         fi
     else
         info "服务未启动"
@@ -119,10 +110,10 @@ show_help() {
     echo "用法: $0 [命令]"
     echo ""
     echo "命令列表:"
-    echo "  dev          - 开发模式启动（热重载）"
+    echo "  dev          - 开发模式启动"
     echo "  prod         - 生产模式启动（后台运行）"
     echo "  foreground   - 前台模式启动（查看日志）"
-    echo "  build        - 仅编译项目"
+    echo "  build        - 仅构建生产版本"
     echo "  stop         - 停止服务"
     echo "  status       - 查看服务状态"
     echo "  restart      - 重启服务"
@@ -137,20 +128,22 @@ show_help() {
 
 case "$1" in
     dev)
-        check_java
+        check_node
         run_dev
         ;;
     prod)
-        check_java
+        check_node
         run_prod
         ;;
     foreground)
-        check_java
+        check_node
         run_foreground
         ;;
     build)
-        check_java
-        build_project
+        check_node
+        install_deps
+        cd "$PROJECT_DIR"
+        npm run build
         ;;
     stop)
         stop_service
