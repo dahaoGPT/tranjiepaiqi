@@ -37,7 +37,7 @@ export default function AudioReviewPlayer({ clips }: AudioReviewPlayerProps) {
           <p className="text-sm font-medium mb-2">{clip.label}</p>
           <audio controls src={clip.playbackUrl} className="w-full">
             您的浏览器不支持音频播放
-          
+          </audio>
         </div>
       ))}
     </div>
