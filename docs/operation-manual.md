@@ -8,12 +8,12 @@
 
 项目由 4 个主要模块组成：
 
-| 模块 | 目录 | 作用 | 默认端口 |
-| --- | --- | --- | --- |
-| PostgreSQL | `docker-compose.yml` | 保存老人、设备、声学特征、用水事件、异常提醒、音频片段元数据 | `5432` |
-| 后端服务 | `backend` | Spring Boot 2.7.18 Web API，使用 MyBatis 和 Flyway | `8080` |
-| 前端应用 | `frontend` | Next.js 移动端优先界面，用于看板、提醒、设备和音频复盘页面 | `3000` |
-| 模拟器 | `simulator` | TypeScript 脚本，模拟声感传感器上传原始音频片段和声学特征 | 无常驻端口 |
+| 模块         | 目录                   | 作用                                             | 默认端口   |
+| ---------- | -------------------- | ---------------------------------------------- | ------ |
+| PostgreSQL | `docker-compose.yml` | 保存老人、设备、声学特征、用水事件、异常提醒、音频片段元数据                 | `5432` |
+| 后端服务       | `backend`            | Spring Boot 2.7.18 Web API，使用 MyBatis 和 Flyway | `8080` |
+| 前端应用       | `frontend`           | Next.js 移动端优先界面，用于看板、提醒、设备和音频复盘页面              | `3000` |
+| 模拟器        | `simulator`          | TypeScript 脚本，模拟声感传感器上传原始音频片段和声学特征             | 无常驻端口  |
 
 当前 MVP 中，后端 API 和模拟器可以真实联调；前端页面目前使用本地样例数据展示移动端交互效果，后续可继续改造为实时调用后端 API。
 
@@ -62,13 +62,13 @@ accepting connections
 
 数据库连接参数：
 
-| 参数 | 值 |
-| --- | --- |
-| Host | `localhost` |
-| Port | `5432` |
-| Database | `jiepaiqi` |
-| Username | `jiepaiqi` |
-| Password | `jiepaiqi` |
+| 参数       | 值           |
+| -------- | ----------- |
+| Host     | `localhost` |
+| Port     | `5432`      |
+| Database | `jiepaiqi`  |
+| Username | `jiepaiqi`  |
+| Password | `jiepaiqi`  |
 
 ## 4. 启动后端服务
 
@@ -144,16 +144,16 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 
 常用测试类：
 
-| 测试类 | 覆盖内容 |
-| --- | --- |
-| `SchemaSmokeTest` | Flyway 建表和应用上下文启动 |
-| `WaterEventAggregatorTest` | 声学特征聚合为用水事件 |
-| `AlertRuleEngineTest` | 晨间未用水、长时间用水、低活动、设备离线等规则 |
-| `FeatureIngestionControllerTest` | 声学特征上传 API |
-| `AudioClipControllerTest` | 原始音频片段上传 API |
-| `LocalAudioStorageServiceTest` | 本地音频文件保存 |
-| `DashboardControllerTest` | 老人看板 API |
-| `AlertControllerTest` | 异常提醒 API |
+| 测试类                              | 覆盖内容                    |
+| -------------------------------- | ----------------------- |
+| `SchemaSmokeTest`                | Flyway 建表和应用上下文启动       |
+| `WaterEventAggregatorTest`       | 声学特征聚合为用水事件             |
+| `AlertRuleEngineTest`            | 晨间未用水、长时间用水、低活动、设备离线等规则 |
+| `FeatureIngestionControllerTest` | 声学特征上传 API              |
+| `AudioClipControllerTest`        | 原始音频片段上传 API            |
+| `LocalAudioStorageServiceTest`   | 本地音频文件保存                |
+| `DashboardControllerTest`        | 老人看板 API                |
+| `AlertControllerTest`            | 异常提醒 API                |
 
 ## 6. 启动前端应用
 
@@ -183,15 +183,15 @@ http://localhost:3000
 
 常用页面：
 
-| 页面 | 地址 | 说明 |
-| --- | --- | --- |
-| 首页 | `http://localhost:3000/` | 入口页 |
-| 登录页 | `http://localhost:3000/login` | 登录入口 |
-| 移动端看板 | `http://localhost:3000/dashboard` | 老人状态、用水节奏、提醒摘要 |
-| 提醒列表 | `http://localhost:3000/alerts` | 异常提醒列表 |
-| 提醒详情 | `http://localhost:3000/alerts/alert-001` | 异常详情和音频复盘入口 |
-| 设备页 | `http://localhost:3000/devices` | 设备状态展示 |
-| 老人详情 | `http://localhost:3000/elders/elder-001` | 老人维度详情 |
+| 页面    | 地址                                       | 说明             |
+| ----- | ---------------------------------------- | -------------- |
+| 首页    | `http://localhost:3000/`                 | 入口页            |
+| 登录页   | `http://localhost:3000/login`            | 登录入口           |
+| 移动端看板 | `http://localhost:3000/dashboard`        | 老人状态、用水节奏、提醒摘要 |
+| 提醒列表  | `http://localhost:3000/alerts`           | 异常提醒列表         |
+| 提醒详情  | `http://localhost:3000/alerts/alert-001` | 异常详情和音频复盘入口    |
+| 设备页   | `http://localhost:3000/devices`          | 设备状态展示         |
+| 老人详情  | `http://localhost:3000/elders/elder-001` | 老人维度详情         |
 
 前端构建测试：
 
@@ -291,28 +291,28 @@ cd E:\3-workspace\2-aiprojects\jiepaiqi
 docker compose up -d postgres
 ```
 
-2. 启动后端。
+1. 启动后端。
 
 ```powershell
 cd E:\3-workspace\2-aiprojects\jiepaiqi\backend
 .\mvnw.cmd spring-boot:run
 ```
 
-3. 运行模拟器。
+1. 运行模拟器。
 
 ```powershell
 cd E:\3-workspace\2-aiprojects\jiepaiqi\simulator
 npm run scenario:normal
 ```
 
-4. 启动前端查看移动端页面。
+1. 启动前端查看移动端页面。
 
 ```powershell
 cd E:\3-workspace\2-aiprojects\jiepaiqi\frontend
 npm run dev
 ```
 
-5. 手机或浏览器访问：
+1. 手机或浏览器访问：
 
 ```text
 http://localhost:3000/dashboard
@@ -505,3 +505,4 @@ npm run scenario:normal
 cd E:\3-workspace\2-aiprojects\jiepaiqi\backend
 .\mvnw.cmd test "-Dtest=SchemaSmokeTest" "-Dspring.datasource.url=jdbc:postgresql://localhost:5432/jiepaiqi" "-Dspring.datasource.username=jiepaiqi" "-Dspring.datasource.password=jiepaiqi"
 ```
+

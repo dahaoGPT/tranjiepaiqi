@@ -8,7 +8,7 @@
 
 **技术栈：** Java 8、Spring Boot 2.7.18、Maven Wrapper、PostgreSQL、Flyway、MyBatis、JUnit 5、Next.js、TypeScript、npm、Playwright 或 React Testing Library 用于前端测试。
 
----
+***
 
 ## 参考规范
 
@@ -65,6 +65,7 @@ docs/superpowers/plans/2026-07-05-jiepaiqi-mvp-implementation.md
 ## 任务 1：仓库初始化
 
 **文件：**
+
 - 创建：`.gitignore`
 - 创建：`docker-compose.yml`
 - 创建：`backend/pom.xml`
@@ -72,7 +73,6 @@ docs/superpowers/plans/2026-07-05-jiepaiqi-mvp-implementation.md
 - 创建：`backend/src/main/resources/application.yml`
 - 创建：`frontend/package.json`
 - 创建：`simulator/package.json`
-
 - [ ] **步骤 1：如需要，初始化 git**
 
 运行：`git status`
@@ -243,12 +243,12 @@ git commit -m "chore: bootstrap jiepaiqi workspace"
 ## 任务 2：数据库迁移和 MyBatis Mapper 骨架
 
 **文件：**
+
 - 创建：`backend/src/main/resources/db/migration/V1__initial_schema.sql`
 - 创建：`identity`、`elder`、`device`、`ingestion`、`audio`、`rhythm`、`alert` 下的纯 Java 模型文件
 - 创建：每个后端模块包下的 MyBatis mapper 接口
 - 创建：`backend/src/main/resources/mapper/` 下的 MyBatis XML mapper 文件
 - 测试：`backend/src/test/java/com/jiepaiqi/db/SchemaSmokeTest.java`
-
 - [ ] **步骤 1：编写 schema 冒烟测试**
 
 创建 `SchemaSmokeTest.java`：
@@ -472,11 +472,11 @@ git commit -m "feat: add initial database schema"
 ## 任务 3：节奏领域逻辑
 
 **文件：**
+
 - 创建：`backend/src/main/java/com/jiepaiqi/rhythm/AcousticFeatureWindow.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/rhythm/WaterEvent.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/rhythm/WaterEventAggregator.java`
 - 测试：`backend/src/test/java/com/jiepaiqi/rhythm/WaterEventAggregatorTest.java`
-
 - [ ] **步骤 1：编写失败的聚合测试**
 
 创建 `WaterEventAggregatorTest.java`：
@@ -564,12 +564,12 @@ git commit -m "feat: aggregate acoustic features into water events"
 ## 任务 4：告警规则引擎
 
 **文件：**
+
 - 创建：`backend/src/main/java/com/jiepaiqi/alert/AlertType.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/alert/AlertCandidate.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/alert/AlertRuleEngine.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/rhythm/RhythmBaseline.java`
 - 测试：`backend/src/test/java/com/jiepaiqi/alert/AlertRuleEngineTest.java`
-
 - [ ] **步骤 1：编写失败的告警规则测试**
 
 创建 `AlertRuleEngineTest.java`：
@@ -663,12 +663,12 @@ git commit -m "feat: add explainable alert rule engine"
 ## 任务 5：音频元数据和存储服务
 
 **文件：**
+
 - 创建：`backend/src/main/java/com/jiepaiqi/audio/AudioClipMetadata.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/audio/AudioStorageProperties.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/audio/AudioStorageService.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/audio/LocalAudioStorageService.java`
 - 测试：`backend/src/test/java/com/jiepaiqi/audio/LocalAudioStorageServiceTest.java`
-
 - [ ] **步骤 1：编写失败的存储测试**
 
 创建 `LocalAudioStorageServiceTest.java`：
@@ -745,12 +745,12 @@ git commit -m "feat: add local audio clip storage"
 ## 任务 6：数据注入和音频上传 API
 
 **文件：**
+
 - 创建：`backend/src/main/java/com/jiepaiqi/ingestion/FeatureIngestionController.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/audio/AudioClipController.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/ingestion/dto/` 下的 DTO 类
 - 测试：`backend/src/test/java/com/jiepaiqi/ingestion/FeatureIngestionControllerTest.java`
 - 测试：`backend/src/test/java/com/jiepaiqi/audio/AudioClipControllerTest.java`
-
 - [ ] **步骤 1：编写失败的特征注入 API 测试**
 
 创建一个 MockMvc 测试，向 `/api/devices/device-001/features` 发送 POST 请求，包含：
@@ -800,7 +800,6 @@ POST /api/devices/{deviceId}/audio-clips
 - `windowEndedAt` 必须在 `windowStartedAt` 之后。
 - 音频内容类型必须是 `audio/wav`、`audio/mpeg` 或 `audio/mp4`。
 - 音频大小必须大于 0 且小于配置的限制。
-
 - [ ] **步骤 5：运行 API 测试**
 
 运行：`cd backend && .\mvnw.cmd test -Dtest=FeatureIngestionControllerTest,AudioClipControllerTest`
@@ -817,12 +816,12 @@ git commit -m "feat: add feature and audio ingestion APIs"
 ## 任务 7：看板和告警 API
 
 **文件：**
+
 - 创建：`backend/src/main/java/com/jiepaiqi/dashboard/DashboardController.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/dashboard/DashboardService.java`
 - 创建：`backend/src/main/java/com/jiepaiqi/alert/AlertController.java`
 - 测试：`backend/src/test/java/com/jiepaiqi/dashboard/DashboardControllerTest.java`
 - 测试：`backend/src/test/java/com/jiepaiqi/alert/AlertControllerTest.java`
-
 - [ ] **步骤 1：编写失败的看板 API 测试**
 
 编写一个 MockMvc 测试，测试 `GET /api/elders/{elderId}/dashboard`。
@@ -908,12 +907,12 @@ git commit -m "feat: add dashboard and alert APIs"
 ## 任务 8：模拟器
 
 **文件：**
+
 - 创建：`simulator/package.json`
 - 创建：`simulator/tsconfig.json`
 - 创建：`simulator/src/index.ts`
 - 创建：`simulator/src/scenarios.ts`
 - 创建：`simulator/src/audio.ts`
-
 - [ ] **步骤 1：创建模拟器包**
 
 使用脚本：
@@ -970,6 +969,7 @@ git commit -m "feat: add acoustic feature simulator"
 ## 任务 9：移动端优先的 Next.js 应用
 
 **文件：**
+
 - 创建：`frontend/package.json`
 - 创建：`frontend/app/layout.tsx`
 - 创建：`frontend/app/login/page.tsx`
@@ -982,7 +982,6 @@ git commit -m "feat: add acoustic feature simulator"
 - 创建：`frontend/components/AudioReviewPlayer.tsx`
 - 创建：`frontend/lib/api.ts`
 - 创建：`frontend/app/globals.css`
-
 - [ ] **步骤 1：创建前端包**
 
 使用脚本：
@@ -1029,7 +1028,6 @@ export async function resolveAlert(alertId: string, note: string): Promise<void>
 - 不自动播放音频；
 - 主要卡片：状态、设备、未处理告警、最近用水事件、基线对比；
 - 主要操作在移动端有全屏点击区域。
-
 - [ ] **步骤 4：实现告警详情音频复盘**
 
 `AudioReviewPlayer.tsx` 接收：
@@ -1065,9 +1063,9 @@ git commit -m "feat: add mobile-first dashboard"
 ## 任务 10：端到端验证
 
 **文件：**
+
 - 创建：`docs/runbook.md`
 - 修改：`README.md`
-
 - [ ] **步骤 1：添加运行手册**
 
 记录命令：
@@ -1088,7 +1086,6 @@ cd simulator && npm run scenario:normal
 - 后端接受音频和特征；
 - 看板显示正常节奏；
 - 不生成生活节奏告警。
-
 - [ ] **步骤 3：验证无晨间用水场景**
 
 运行模拟器 no-morning-water 场景。
@@ -1127,3 +1124,4 @@ git commit -m "docs: add MVP runbook"
 
 1. 子代理驱动（推荐）：每个任务使用新的子代理，任务之间进行审查。
 2. 内联执行：在当前会话中执行任务，设置检查点。
+
